@@ -54,8 +54,26 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
+    public function feedPosts() {
+            // model we wanna end up with | User they followed | m1,m2,m1fk,m2fk,local_id,intermediate_id(u want to get/fk)
+            return $this->hasManyThrough(Post::class, Follow::class, 'user_id', 'user_id', 'id', 'followeduser');
+    }
+
+    public function followers(){
+        // a user has many follows
+        //a.b = b is a foreign key powering ;
+        //for short, in the User, get the data with the foreign key 'followeduser' from the Follows table
+        return $this->hasMany(Follow::class, 'followeduser');
+    }
+    
+    public function followingTheseUsers(){
+
+        return $this->hasMany(Follow::class, 'user_id');
+    }
+
     public function posts(){
         //relationship in the Datbase model, to  POST 'user_id' which is powering the relationship
+        // relation between the user and the post
         return $this->hasMany(Post::class, 'user_id');
     }
 }

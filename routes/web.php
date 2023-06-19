@@ -5,6 +5,11 @@ use Illuminate\Support\Facades\Gate; // Add this line
 
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\FollowController;
+
+// TESTING ONLY
+use Illuminate\Support\Facades\Http;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -35,6 +40,12 @@ Route::post('/logout', [UserController::class, "logout"])->middleware('auth');
 route::get('/manage-avatar', [UserController::class, "showAvatarForm"])->middleware('auth');
 route::post('/manage-avatar', [UserController::class, "storeAvatar"])->middleware('auth');
 
+
+// Follow related routes
+Route::post('/create-follow/{user:username}', [FollowController::class, "createFollow"])->middleware('auth');
+Route::post('/remove-follow/{user:username}', [FollowController::class, "removeFollow"])->middleware('auth');
+// Route::get('/unfollow', [UserController::class, "unfollow"])->middleware('auth');
+
 // Blog post related routes
 Route::get('/create-post', [PostController::class, 'showCreateForm'])->middleware('auth');
 Route::post('/create-post', [PostController::class, 'storeNewPost'])->middleware('auth');
@@ -45,3 +56,14 @@ Route::put('/post/{post}', [PostController::class, 'updatePost'])->middleware('c
 
 // Profile Relates Routes / lookup based on the username, by default is id
 Route::get('/profile/{user:username}', [UserController::class, 'profile'] );
+Route::get('/profile/{user:username}/followers', [UserController::class, 'profileFollowers'] );
+Route::get('/profile/{user:username}/following', [UserController::class, 'profileFollowing'] );
+
+
+// TESTING ONLY
+Route::get('/tester', function() {
+    $response = Http::get('https://randomuser.me/api?results=1&gender=&password=upper,lower,12&exc=register,picture,id&nat=US');
+    
+    return $response['results'][0]['name'];
+
+});

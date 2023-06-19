@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers;
 
-
+use App\Models\Follow;
 use App\Models\User;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\View;
 use Illuminate\Validation\Rule;
 use Intervention\Image\Facades\Image;
-
+use SebastianBergmann\CodeUnit\FunctionUnit;
 
 class UserController extends Controller
 {
@@ -16,7 +18,8 @@ class UserController extends Controller
 
     public function showCorrectHomepage(){
         if (auth()-> check()){
-            return view('homepage-feed');
+            // auth-usermodel-usermodelfunction-filter
+            return view('homepage-feed', ['posts' => auth()->user()->feedPosts()->latest()->get()]);
         }else{
             return view('homepage');
         }
@@ -38,6 +41,7 @@ class UserController extends Controller
 
     }
 
+    
 
     //
     public function register(Request $request){
@@ -58,18 +62,44 @@ class UserController extends Controller
     }
 
 
-    
+    private function getSharedData($user){
+        $currentlyFollowing = 0;
+
+        if(auth()->check()){
+            $currentlyFollowing = Follow::where([['user_id', '=' , auth()->user()->id],
+            ['followeduser', '=' , $user->id]])->count();
+        }
+
+        // FROM User get the Post Model from the User Model;
+        // $thePosts = $user->posts()->get(); //return json
+        View::share('sharedData', ['username' => $user->username,
+        'postCount' => $user->posts()->count(), // count the number of posts
+        'avatar' => $user->avatar,
+        'currentlyFollowing' => $currentlyFollowing,  
+        'followerCount' => $user->followers()->count(),
+        'followingCount' => $user->followingTheseUsers()->count(),
+    ]);
+
+    }
 
     // get the username from the url and pass it to the view
     public function profile(User $user){
-        // FROM User get the Post Model from the User Model;
-        // $thePosts = $user->posts()->get(); //return json
-        return view('profile', ['username' => $user->username,
-        'posts' => $user->posts()->latest()->get(),
-        'postCount' => $user->posts()->count(), // count the number of posts
-        'avatar' => $user->avatar,
-    ]);
+        $this->getSharedData($user); //pass the user to the function to get the shared data
+        return view('profile-posts', ['posts' => $user->posts()->latest()->get()]);
     }
+
+
+    public function profileFollowers(User $user){
+        $this->getSharedData($user);
+        // return $user->followers()->latest()->get();
+        return view('profile-followers', ['followers' => $user->followers()->latest()->get()]);
+    }
+
+
+    public function profileFollowing(User $user){
+        $this->getSharedData($user);
+        //fro the Model User get the function of followingTheseUsers
+        return view('profile-following', ['following' => $user->followingTheseUsers()->latest()->get()]);}
 
 
     public function showAvatarForm(){
@@ -91,7 +121,7 @@ class UserController extends Controller
 
         $oldAvatar = $user->avatar;
 
-        // save to DB 
+        // save to DB  
        
         
         $user->avatar = $filename .'.jpg';
