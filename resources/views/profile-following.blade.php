@@ -1,5 +1,5 @@
 {{-- pass the value  --}}
-<x-profile :sharedData="$sharedData" >
+<x-profile :sharedData="$sharedData" doctitle="{{ $sharedData['username']}}'s Following" >
   <div class="list-group">
           
   {{-- following / where the name being pass from the controller --}}

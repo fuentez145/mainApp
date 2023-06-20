@@ -18,8 +18,8 @@ class UserController extends Controller
 
     public function showCorrectHomepage(){
         if (auth()-> check()){
-            // auth-usermodel-usermodelfunction-filter
-            return view('homepage-feed', ['posts' => auth()->user()->feedPosts()->latest()->get()]);
+            // auth-usermodel-usermodelfunction-filter          | change the (->get) to (->paginate(5)) to paginate the posts
+            return view('homepage-feed', ['posts' => auth()->user()->feedPosts()->latest()->paginate(4)]);
         }else{
             return view('homepage');
         }
