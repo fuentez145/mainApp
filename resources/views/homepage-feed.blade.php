@@ -9,13 +9,17 @@
             
       
           @foreach ($posts as $item)
-          <a href="/post/{{$item['id']}}" class="list-group-item list-group-item-action">
-            <img class="avatar-tiny" src="{{ $item->user->avatar }}" />
-            <strong>{{$item['title']}} </strong> <span class="text-muted small">by {{ $item->user->username}} on {{ $item['created_at']->format('m/d/Y ') }}</span>
-          </a>
+
+          {{-- from the components --}}
+          <x-post :item="$item" />
+          
           @endforeach
         
         </div>
+
+          <div class="mt-4">
+            {{ $posts->links()}}
+          </div>
 
         @else 
         <div class="text-center">

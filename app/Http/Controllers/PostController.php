@@ -11,6 +11,15 @@ class PostController extends Controller
 {
     //
 
+    public function search($term) {
+         // from scout function
+        $posts = Post::search($term)->get();
+
+        // load with the user infomation from the model, which get the id username and avatar
+        $posts->load('user:id,username,avatar');
+        return $posts;
+    }
+
     public function updatePost(Post $post, Request $request){
       $incomingFields = $request->validate([
         'title' => 'required',

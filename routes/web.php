@@ -7,8 +7,7 @@ use App\Http\Controllers\PostController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\FollowController;
 
-// TESTING ONLY
-use Illuminate\Support\Facades\Http;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -53,6 +52,7 @@ Route::get('/post/{post}', [PostController::class, 'viewSinglePost']);
 Route::delete('/post/{post}', [PostController::class, 'delete'])->middleware('can:delete,post');
 Route::get('/post/{post}/edit', [PostController::class, 'showEditForm'])->middleware('can:update,post');
 Route::put('/post/{post}', [PostController::class, 'updatePost'])->middleware('can:update,post');
+Route::get('/search/{term}',[PostController::class, 'search']);
 
 // Profile Relates Routes / lookup based on the username, by default is id
 Route::get('/profile/{user:username}', [UserController::class, 'profile'] );
@@ -60,10 +60,3 @@ Route::get('/profile/{user:username}/followers', [UserController::class, 'profil
 Route::get('/profile/{user:username}/following', [UserController::class, 'profileFollowing'] );
 
 
-// TESTING ONLY
-Route::get('/tester', function() {
-    $response = Http::get('https://randomuser.me/api?results=1&gender=&password=upper,lower,12&exc=register,picture,id&nat=US');
-    
-    return $response['results'][0]['name'];
-
-});
