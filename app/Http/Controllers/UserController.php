@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\OurExampleEvent;
 use App\Models\Follow;
 use App\Models\User;
 
@@ -34,6 +35,7 @@ class UserController extends Controller
         // attemp to login usin auth(); array of [tablename => name from Request Form array]
         if(auth()->attempt(['username'=> $incomingFields['loginusername'], 'password'=> $incomingFields['loginpassword']])){
             $request->session()->regenerate();
+            event(new OurExampleEvent());
             return  redirect('/')->with('success', 'Logged in successfully');
         }else{
             return  redirect('/')->with('failure', 'Invalid credentials');
@@ -58,6 +60,7 @@ class UserController extends Controller
 
     public function logout(){
         auth()->logout();
+        event(new OurExampleEvent());
         return redirect('/')->with('success', 'Logged out successfully');
     }
 

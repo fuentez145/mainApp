@@ -1,13 +1,15 @@
 <?php
 
+use App\Events\ChatMessage;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Gate; // Add this line
 
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\FollowController;
+use Illuminate\Http\Request;
 
-
+// use GuzzleHttp\Psr7\Request;
 
 /*
 |--------------------------------------------------------------------------
@@ -58,5 +60,27 @@ Route::get('/search/{term}',[PostController::class, 'search']);
 Route::get('/profile/{user:username}', [UserController::class, 'profile'] );
 Route::get('/profile/{user:username}/followers', [UserController::class, 'profileFollowers'] );
 Route::get('/profile/{user:username}/following', [UserController::class, 'profileFollowing'] );
+
+
+// CHat Route
+Route::post('/send-chat-message', function (Request $request){
+    $formFields = $request->validate([
+        'textvalue' => 'required'
+    ]);
+
+
+    if(!trim(strip_tags($formFields['textvalue']))){
+        return response()->noContent();
+    }
+
+    broadcast(new ChatMessage([
+        'username' => auth()->user()->username,
+        'avatar' => auth()->user()->avatar,
+        'textvalue' => strip_tags($formFields['textvalue']),
+    ]))->toOthers();
+
+    return response()->noContent();
+});
+
 
 
