@@ -58,6 +58,8 @@ class PostController extends Controller
     public function showCreateForm(){
         return view('create-post');
     }
+    
+
 
     public function storeNewPost(Request $request){
         $incomingFields = $request->validate([
@@ -74,6 +76,27 @@ class PostController extends Controller
         $newPost = Post::create($incomingFields);
 
         return redirect("/post/{$newPost->id}")->with('success', 'Post created successfully');
+    }
+
+
+    public function createPostApi(Request $request){
+        $incomingFields = $request->validate([
+            'title' => 'required',
+            'body' => 'required',
+            // 'tags' => $request->tags,
+            // 'user_id' => $request->user_id
+        ]);
+        $incomingFields['title'] = strip_tags($incomingFields['title']);
+        $incomingFields['body'] = strip_tags($incomingFields['body']);
+        $incomingFields['user_id'] = auth()->user()->id;
+        
+        // model validation
+        $newPost = Post::create($incomingFields);
+        // response()->json($incomingFields);
+        // return to $request json
+        return $newPost->id;
+        
+      
     }
 
    

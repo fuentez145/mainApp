@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\View;
 use Illuminate\Validation\Rule;
 use Intervention\Image\Facades\Image;
+use LDAP\Result;
 use SebastianBergmann\CodeUnit\FunctionUnit;
 
 class UserController extends Controller
@@ -137,4 +138,23 @@ class UserController extends Controller
 
         return back()->with('success', 'Avatar updated successfully');
     }
+
+
+    public function loginApi(Request $request) {
+        $incomingFields = $request->validate([
+            'username' => 'required',
+            'password' => 'required',
+        ]);
+
+        if(auth()->attempt($incomingFields)){
+            $user = User::where('username', $incomingFields['username'])->first();
+            $token = $user->createToken('ourAppToken')->plainTextToken;
+            
+            return $token;
+        }
+
+        return 'wrong login';
+
+    }
+
 }
